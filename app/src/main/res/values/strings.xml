@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Minsticker</string>
+    <string name="subtype_sticker">Bàn phím Sticker</string>
+    <string name="keyboard_settings">Cài đặt bàn phím</string>
+    <string name="keyboard_step1_enable">1. Bật bàn phím trong Cài đặt</string>
+    <string name="keyboard_step2_select">2. Chọn Minsticker làm bàn phím</string>
+    <string name="keyboard_ready">Bàn phím Minsticker đã sẵn sàng!</string>
+    <string name="create_sticker">Tạo Sticker</string>
+    <string name="gallery_empty">Chưa có sticker nào. Hãy bấm + để tạo sticker đầu tiên!</string>
+</resources>

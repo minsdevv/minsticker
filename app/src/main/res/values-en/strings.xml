@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Minsticker</string>
+    <string name="subtype_sticker">Sticker Keyboard</string>
+    <string name="keyboard_settings">Keyboard Settings</string>
+    <string name="keyboard_step1_enable">1. Enable in System Settings</string>
+    <string name="keyboard_step2_select">2. Select Minsticker as Input Method</string>
+    <string name="keyboard_ready">Minsticker Keyboard is ready!</string>
+    <string name="create_sticker">Create Sticker</string>
+    <string name="gallery_empty">No stickers yet. Tap + to create your first sticker!</string>
+</resources>
