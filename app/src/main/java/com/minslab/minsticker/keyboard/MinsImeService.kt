@@ -85,6 +85,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.minslab.minsticker.MainActivity
 import com.minslab.minsticker.data.StickerEntity
 import com.minslab.minsticker.data.StickerRepository
+import com.minslab.minsticker.ui.theme.M3Background
+import com.minslab.minsticker.ui.theme.M3OnPrimary
+import com.minslab.minsticker.ui.theme.M3OnPrimaryContainer
+import com.minslab.minsticker.ui.theme.M3OnSurface
+import com.minslab.minsticker.ui.theme.M3OnSurfaceVariant
+import com.minslab.minsticker.ui.theme.M3OutlineVariant
+import com.minslab.minsticker.ui.theme.M3Primary
+import com.minslab.minsticker.ui.theme.M3PrimaryContainer
+import com.minslab.minsticker.ui.theme.M3SurfaceContainer
+import com.minslab.minsticker.ui.theme.M3SurfaceContainerHigh
+import com.minslab.minsticker.ui.theme.M3SurfaceContainerHighest
+import com.minslab.minsticker.ui.theme.MinstickerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -165,12 +177,12 @@ class MinsImeService : InputMethodService(),
             setViewTreeSavedStateRegistryOwner(this@MinsImeService)
 
             setContent {
-                MaterialTheme {
+                MinstickerTheme {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(295.dp),
-                        color = Color(0xFF13131D)
+                        color = M3Background
                     ) {
                         StickerKeyboardContent()
                     }
@@ -203,26 +215,26 @@ class MinsImeService : InputMethodService(),
                 currentPackageName.contains("messenger") -> "Messenger" to Color(0xFF0099FF)
                 currentPackageName.contains("instagram") -> "Instagram" to Color(0xFFE1306C)
                 currentPackageName.contains("viber") -> "Viber" to Color(0xFF7360F2)
-                currentPackageName.contains("messages") -> "Messages" to Color(0xFF89B4FA)
-                currentPackageName.contains("minsticker") -> "Phòng Test" to Color(0xFFA6E3A1)
-                else -> "Sticker" to Color(0xFFA6ADC8)
+                currentPackageName.contains("messages") -> "Messages" to M3Primary
+                currentPackageName.contains("minsticker") -> "Phòng Test" to M3Primary
+                else -> "Sticker" to M3OnSurfaceVariant
             }
         }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF13131D))
+                .background(M3Background)
         ) {
             // Subtle top divider
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(Color(0x18FFFFFF))
+                    .background(M3OutlineVariant.copy(alpha = 0.35f))
             )
 
-            // Top Control Bar (iOS 17 Sticker Drawer Style)
+            // Top Control Bar (Material 3 Expressive Pill Drawer)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -233,8 +245,8 @@ class MinsImeService : InputMethodService(),
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF20202F))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(M3SurfaceContainerHigh)
                         .clickable {
                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                             switchToNextInputMethod(false)
@@ -244,7 +256,7 @@ class MinsImeService : InputMethodService(),
                     Icon(
                         Icons.Default.Keyboard,
                         contentDescription = "Đổi phím",
-                        tint = Color(0xFFA6ADC8),
+                        tint = M3OnSurface,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -254,9 +266,9 @@ class MinsImeService : InputMethodService(),
                 // Target App Badge
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF1C1C2A))
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(M3SurfaceContainer)
+                        .padding(horizontal = 8.dp, vertical = 5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -268,7 +280,7 @@ class MinsImeService : InputMethodService(),
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = appBadgeInfo.first,
-                        color = Color.White,
+                        color = M3OnSurface,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -276,12 +288,12 @@ class MinsImeService : InputMethodService(),
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-                // iOS-Style Segmented Category Tabs
+                // Google Pixel Material You Segmented Category Tabs
                 Row(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF1E1E2E))
+                        .background(M3SurfaceContainer)
                         .padding(2.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -290,11 +302,11 @@ class MinsImeService : InputMethodService(),
                     tabs.forEachIndexed { index, title ->
                         val isSelected = selectedTabIndex == index
                         val bg by animateColorAsState(
-                            targetValue = if (isSelected) Color(0xFF35364C) else Color.Transparent,
+                            targetValue = if (isSelected) M3Primary else Color.Transparent,
                             label = "tabBg"
                         )
                         val textColor by animateColorAsState(
-                            targetValue = if (isSelected) Color.White else Color(0xFF8E90A6),
+                            targetValue = if (isSelected) M3OnPrimary else M3OnSurfaceVariant,
                             label = "tabText"
                         )
                         Box(
@@ -326,8 +338,8 @@ class MinsImeService : InputMethodService(),
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF20202F))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(M3SurfaceContainerHigh)
                         .clickable {
                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                             val intent = Intent(this@MinsImeService, MainActivity::class.java).apply {
@@ -341,7 +353,7 @@ class MinsImeService : InputMethodService(),
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Tạo sticker mới",
-                        tint = Color(0xFF89B4FA),
+                        tint = M3Primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -353,8 +365,8 @@ class MinsImeService : InputMethodService(),
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(if (isBackspaceHeld) Color(0xFF35364C) else Color(0xFF20202F))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (isBackspaceHeld) M3SurfaceContainerHighest else M3SurfaceContainerHigh)
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onPress = {
@@ -381,7 +393,7 @@ class MinsImeService : InputMethodService(),
                     Icon(
                         Icons.AutoMirrored.Filled.Backspace,
                         contentDescription = "Xóa",
-                        tint = Color(0xFFA6ADC8),
+                        tint = M3OnSurface,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -407,13 +419,13 @@ class MinsImeService : InputMethodService(),
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         "Chưa có sticker yêu thích",
-                                        color = Color.White,
+                                        color = M3OnSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
                                     Text(
                                         "Mở ứng dụng Minsticker để gắn tim sticker bạn thích",
-                                        color = Color(0xFFA6ADC8),
+                                        color = M3OnSurfaceVariant,
                                         fontSize = 11.sp
                                     )
                                 }
@@ -424,13 +436,13 @@ class MinsImeService : InputMethodService(),
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         "Chưa có sticker gần đây",
-                                        color = Color.White,
+                                        color = M3OnSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
                                     Text(
                                         "Chạm vào sticker ở tab Tất cả để gửi ngay",
-                                        color = Color(0xFFA6ADC8),
+                                        color = M3OnSurfaceVariant,
                                         fontSize = 11.sp
                                     )
                                 }
@@ -459,7 +471,7 @@ class MinsImeService : InputMethodService(),
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(
                                                 "Chạm sticker mẫu ở trên để gửi thử!",
-                                                color = Color(0xFF89B4FA),
+                                                color = M3Primary,
                                                 fontSize = 11.sp
                                             )
                                             Spacer(modifier = Modifier.height(10.dp))
@@ -476,10 +488,10 @@ class MinsImeService : InputMethodService(),
                                             startActivity(intent)
                                         },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF89B4FA),
-                                            contentColor = Color.Black
+                                            containerColor = M3Primary,
+                                            contentColor = M3OnPrimary
                                         ),
-                                        shape = RoundedCornerShape(10.dp),
+                                        shape = RoundedCornerShape(12.dp),
                                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                                     ) {
                                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -545,15 +557,15 @@ class MinsImeService : InputMethodService(),
         )
 
         val bgAlpha by animateFloatAsState(
-            targetValue = if (isPressed) 0.18f else 0.05f,
+            targetValue = if (isPressed) 0.22f else 0.06f,
             label = "stickerBgAlpha"
         )
 
         Box(
             modifier = modifier
                 .scale(scale)
-                .clip(RoundedCornerShape(14.dp))
-                .background(Color.White.copy(alpha = bgAlpha))
+                .clip(RoundedCornerShape(16.dp))
+                .background(M3Primary.copy(alpha = bgAlpha))
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,

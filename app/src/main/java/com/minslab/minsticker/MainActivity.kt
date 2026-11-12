@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import com.minslab.minsticker.keyboard.SampleStickerGenerator
 import com.minslab.minsticker.ui.EditorScreen
 import com.minslab.minsticker.ui.HomeScreen
+import com.minslab.minsticker.ui.theme.MinstickerTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent)
 
         setContent {
-            MaterialTheme {
+            MinstickerTheme {
                 when (val screen = currentScreen) {
                     is Screen.Home -> {
                         HomeScreen(

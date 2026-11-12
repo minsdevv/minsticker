@@ -65,6 +65,22 @@ import com.minslab.minsticker.segmentation.OutlineRenderer
 import com.minslab.minsticker.segmentation.OutlineStyle
 import com.minslab.minsticker.segmentation.StickerOptimizer
 import com.minslab.minsticker.segmentation.SubjectSegmenter
+import com.minslab.minsticker.ui.theme.M3Background
+import com.minslab.minsticker.ui.theme.M3Error
+import com.minslab.minsticker.ui.theme.M3ErrorContainer
+import com.minslab.minsticker.ui.theme.M3OnBackground
+import com.minslab.minsticker.ui.theme.M3OnErrorContainer
+import com.minslab.minsticker.ui.theme.M3OnPrimary
+import com.minslab.minsticker.ui.theme.M3OnPrimaryContainer
+import com.minslab.minsticker.ui.theme.M3OnSurface
+import com.minslab.minsticker.ui.theme.M3OnSurfaceVariant
+import com.minslab.minsticker.ui.theme.M3Outline
+import com.minslab.minsticker.ui.theme.M3OutlineVariant
+import com.minslab.minsticker.ui.theme.M3Primary
+import com.minslab.minsticker.ui.theme.M3PrimaryContainer
+import com.minslab.minsticker.ui.theme.M3SurfaceContainer
+import com.minslab.minsticker.ui.theme.M3SurfaceContainerHigh
+import com.minslab.minsticker.ui.theme.M3SurfaceContainerHighest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,13 +162,13 @@ fun EditorScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF181825),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = M3Background,
+                    titleContentColor = M3OnBackground,
+                    navigationIconContentColor = M3OnBackground
                 )
             )
         },
-        containerColor = Color(0xFF181825)
+        containerColor = M3Background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -161,20 +177,20 @@ fun EditorScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Preview Canvas (Checkerboard/Dark Container)
+            // Preview Canvas (Material 3 Container)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(Color(0xFF313244), RoundedCornerShape(16.dp))
-                    .border(1.dp, Color(0xFF45475A), RoundedCornerShape(16.dp)),
+                    .background(M3SurfaceContainer, RoundedCornerShape(24.dp))
+                    .border(1.dp, M3OutlineVariant.copy(alpha = 0.5f), RoundedCornerShape(24.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (isProcessing) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = Color(0xFF89B4FA))
+                        CircularProgressIndicator(color = M3Primary)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Đang tách nền AI...", color = Color.White, fontSize = 14.sp)
+                        Text("Đang tách nền AI...", color = M3OnSurface, fontSize = 14.sp)
                     }
                 } else if (previewBitmap != null) {
                     Image(
@@ -197,19 +213,19 @@ fun EditorScreen(
                             },
                             modifier = Modifier
                                 .size(64.dp)
-                                .background(Color(0xFF89B4FA), CircleShape)
+                                .background(M3Primary, CircleShape)
                         ) {
                             Icon(
                                 Icons.Default.AddPhotoAlternate,
                                 contentDescription = "Chọn ảnh",
-                                tint = Color.Black,
+                                tint = M3OnPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             "Chạm để chọn ảnh từ bộ sưu tập",
-                            color = Color(0xFFA6ADC8),
+                            color = M3OnSurfaceVariant,
                             fontSize = 14.sp
                         )
                     }
@@ -224,7 +240,7 @@ fun EditorScreen(
                     ) {
                         Text(
                             text = errorMessage!!,
-                            color = Color(0xFFF38BA8),
+                            color = M3Error,
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -237,10 +253,10 @@ fun EditorScreen(
                                 errorMessage = null
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF89B4FA),
-                                contentColor = Color.Black
+                                containerColor = M3PrimaryContainer,
+                                contentColor = M3OnPrimaryContainer
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Text("Dùng hình mẫu thử nghiệm (Waydroid)", fontSize = 12.sp)
                         }
@@ -255,7 +271,7 @@ fun EditorScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Kiểu viền sticker (phong cách iOS 17):",
-                        color = Color.White,
+                        color = M3OnSurface,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -272,10 +288,10 @@ fun EditorScreen(
                                 onClick = { currentOutlineStyle = style },
                                 label = { Text(style.title, fontSize = 12.sp) },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFF89B4FA),
-                                    selectedLabelColor = Color.Black,
-                                    containerColor = Color(0xFF313244),
-                                    labelColor = Color.White
+                                    selectedContainerColor = M3Primary,
+                                    selectedLabelColor = M3OnPrimary,
+                                    containerColor = M3SurfaceContainerHigh,
+                                    labelColor = M3OnSurface
                                 )
                             )
                         }
@@ -288,13 +304,15 @@ fun EditorScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Đổ bóng nổi (Drop Shadow)", color = Color.White, fontSize = 13.sp)
+                        Text("Đổ bóng nổi (Drop Shadow)", color = M3OnSurface, fontSize = 13.sp)
                         Switch(
                             checked = enableShadow,
                             onCheckedChange = { enableShadow = it },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF89B4FA)
+                                checkedThumbColor = M3OnPrimary,
+                                checkedTrackColor = M3Primary,
+                                uncheckedTrackColor = M3SurfaceContainerHighest,
+                                uncheckedThumbColor = M3Outline
                             )
                         )
                     }
@@ -312,10 +330,13 @@ fun EditorScreen(
                                 )
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF45475A))
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = M3SurfaceContainerHigh,
+                                contentColor = M3OnSurface
+                            )
                         ) {
-                            Text("Đổi ảnh", color = Color.White)
+                            Text("Đổi ảnh", color = M3OnSurface)
                         }
 
                         Button(
@@ -343,12 +364,15 @@ fun EditorScreen(
                                 }
                             },
                             modifier = Modifier.weight(1.5f),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA6E3A1))
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = M3Primary,
+                                contentColor = M3OnPrimary
+                            )
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black)
+                            Icon(Icons.Default.Check, contentDescription = null, tint = M3OnPrimary)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Lưu Sticker", color = Color.Black, fontWeight = FontWeight.Bold)
+                            Text("Lưu Sticker", color = M3OnPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
