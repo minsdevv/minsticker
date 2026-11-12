@@ -34,13 +34,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.KeyboardAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -70,9 +75,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -145,26 +150,14 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.drawable.app_icon),
+                            contentDescription = "App Icon",
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(38.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    Brush.linearGradient(
-                                        listOf(
-                                            MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.colorScheme.tertiary
-                                        )
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                                contentDescription = "App Icon",
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
@@ -174,7 +167,7 @@ fun HomeScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "Google Material You • Sticker Keyboard",
+                                if (isVi) "Bàn phím nhãn dán • Google Material 3" else "Sticker Keyboard • Google Material 3",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -213,7 +206,7 @@ fun HomeScreen(
                 icon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(22.dp)) },
                 text = {
                     Text(
-                        if (isVi) "Tạo Sticker" else "Create Sticker",
+                        if (isVi) "Tạo nhãn dán" else "Create Sticker",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -273,7 +266,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        if (isVi) "Bộ sưu tập" else "Collection",
+                        if (isVi) "Thư viện nhãn dán" else "Sticker Library",
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp,
                         color = MaterialTheme.colorScheme.onSurface
@@ -286,24 +279,45 @@ fun HomeScreen(
                             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .padding(2.dp)
                     ) {
-                        val tabs = listOf(
-                            (if (isVi) "Tất cả" else "All") + " (${stickers.size})",
-                            "❤️ " + (if (isVi) "Yêu thích" else "Favorites") + " (${favoriteStickers.size})"
-                        )
-                        tabs.forEachIndexed { index, title ->
-                            val isSelected = activeTab == index
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
-                                    .clickable { activeTab = index }
-                                    .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
+                        // Tab 0: Tất cả
+                        val isAllSelected = activeTab == 0
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(if (isAllSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                                .clickable { activeTab = 0 }
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = (if (isVi) "Tất cả" else "All") + " (${stickers.size})",
+                                fontSize = 12.sp,
+                                fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isAllSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        // Tab 1: Yêu thích (Clean vector icon instead of emoji)
+                        val isFavSelected = activeTab == 1
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(if (isFavSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                                .clickable { activeTab = 1 }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Favorite,
+                                    contentDescription = null,
+                                    tint = if (isFavSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = title,
+                                    text = (if (isVi) "Yêu thích" else "Favorites") + " (${favoriteStickers.size})",
                                     fontSize = 12.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                                    fontWeight = if (isFavSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isFavSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -328,16 +342,18 @@ fun HomeScreen(
                                 .padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                if (activeTab == 1) "❤️" else "✨",
-                                fontSize = 42.sp
+                            Icon(
+                                if (activeTab == 1) Icons.Default.FavoriteBorder else Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 if (activeTab == 1)
-                                    (if (isVi) "Chưa có sticker yêu thích" else "No favorite stickers")
+                                    (if (isVi) "Chưa có nhãn dán yêu thích" else "No favorite stickers")
                                 else
-                                    (if (isVi) "Chưa có sticker nào" else "No stickers yet"),
+                                    (if (isVi) "Thư viện nhãn dán trống" else "Sticker library is empty"),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
@@ -345,9 +361,9 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 if (activeTab == 1)
-                                    (if (isVi) "Chạm vào hình trái tim trên sticker bất kỳ để thêm vào mục yêu thích." else "Tap the heart on any sticker to add to favorites.")
+                                    (if (isVi) "Nhấn biểu tượng trái tim trên bất kỳ nhãn dán nào để lưu vào danh mục yêu thích." else "Tap the heart on any sticker to add it to favorites.")
                                 else
-                                    (if (isVi) "Bấm nút Tạo Sticker bên dưới để tách ảnh và tạo sticker đầu tiên!" else "Tap the Create Sticker button below to make your first sticker!"),
+                                    (if (isVi) "Nhấn nút \"Tạo nhãn dán\" bên dưới để chọn ảnh và tự động tách nền." else "Tap the Create Sticker button below to make your first sticker."),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp,
@@ -465,7 +481,7 @@ private fun KeyboardPreviewSandbox(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        if (isVi) "Phòng Thử Nghiệm Bàn Phím" else "Keyboard Preview Sandbox",
+                        if (isVi) "Khu vực xem trước bàn phím" else "Keyboard Preview Area",
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
@@ -489,9 +505,9 @@ private fun KeyboardPreviewSandbox(
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 if (isVi)
-                    "Chạm vào ô bên dưới để mở bàn phím Minsticker và chạm gửi sticker để xem hiệu ứng!"
+                    "Chạm vào ô văn bản bên dưới để mở bàn phím và gửi thử nhãn dán trực tiếp."
                 else
-                    "Tap below to open Minsticker keyboard and tap stickers to preview live!",
+                    "Tap text input below to test keyboard and send stickers live.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp,
                 lineHeight = 16.sp
@@ -515,16 +531,21 @@ private fun KeyboardPreviewSandbox(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("💬", fontSize = 24.sp)
+                        Icon(
+                            Icons.Default.Forum,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            modifier = Modifier.size(24.dp)
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            if (isVi) "Chưa có sticker gửi thử nào" else "No stickers sent yet",
+                            if (isVi) "Chưa có nhãn dán xem trước" else "No preview stickers yet",
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            if (isVi) "Bật bàn phím & chạm gửi 1 sticker để trải nghiệm!" else "Open keyboard & tap any sticker to test!",
+                            if (isVi) "Mở bàn phím và chọn nhãn dán để gửi vào đây" else "Open keyboard and send stickers to test",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
                         )
@@ -549,12 +570,21 @@ private fun KeyboardPreviewSandbox(
                                     modifier = Modifier.size(76.dp)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    if (isVi) "Đã nhận ✓✓" else "Received ✓✓",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        if (isVi) "Đã nhận" else "Received",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
@@ -682,17 +712,23 @@ private fun MaterialOnboardingBanner(
                 !isImeEnabled -> {
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("1", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                            Icon(
+                                Icons.Default.TouchApp,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                if (isVi) "Bật bàn phím Minsticker" else "Enable Minsticker Keyboard",
+                                if (isVi) "Kích hoạt bàn phím Minsticker" else "Enable Minsticker Keyboard",
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 14.sp
                             )
                         }
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            if (isVi) "Vào Cài đặt hệ thống để kích hoạt bàn phím" else "Go to System Settings to enable keyboard",
+                            if (isVi) "Mở cài đặt hệ thống để cấp quyền cho bàn phím Minsticker" else "Open system settings to enable Minsticker keyboard",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -706,23 +742,29 @@ private fun MaterialOnboardingBanner(
                         shape = RoundedCornerShape(14.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                     ) {
-                        Text(if (isVi) "Bật ngay" else "Enable", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(if (isVi) "Kích hoạt" else "Enable", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
                 !isImeSelected -> {
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("2", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
+                            Icon(
+                                Icons.Default.KeyboardAlt,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                if (isVi) "Chọn Minsticker làm bàn phím" else "Select Minsticker Keyboard",
+                                if (isVi) "Thiết lập phương thức nhập mặc định" else "Select Default Input Method",
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 14.sp
                             )
                         }
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            if (isVi) "Chuyển bàn phím hiện tại sang Minsticker" else "Switch active input method to Minsticker",
+                            if (isVi) "Chuyển bàn phím hiện tại của máy sang Minsticker" else "Switch active input method to Minsticker",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -736,7 +778,7 @@ private fun MaterialOnboardingBanner(
                         shape = RoundedCornerShape(14.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                     ) {
-                        Text(if (isVi) "Chọn phím" else "Select", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(if (isVi) "Lựa chọn" else "Select", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
                 else -> {
@@ -753,13 +795,13 @@ private fun MaterialOnboardingBanner(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                if (isVi) "Bàn phím Minsticker đã sẵn sàng!" else "Minsticker Keyboard is ready!",
+                                if (isVi) "Bàn phím Minsticker đã sẵn sàng sử dụng" else "Minsticker Keyboard is ready!",
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 14.sp
                             )
                             Text(
-                                if (isVi) "Hoạt động trong Zalo, WhatsApp, Telegram và phòng test bên dưới" else "Works with Zalo, WhatsApp, Telegram and sandbox below",
+                                if (isVi) "Tương thích với Zalo, WhatsApp, Telegram và khu vực thử nghiệm bên dưới" else "Works with Zalo, WhatsApp, Telegram and sandbox below",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -874,7 +916,7 @@ private fun StickerDetailSheetContent(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     if (sticker.isFavorite)
-                        (if (isVi) "Bỏ thích" else "Unfavorite")
+                        (if (isVi) "Bỏ yêu thích" else "Unfavorite")
                     else
                         (if (isVi) "Yêu thích" else "Favorite"),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -895,7 +937,7 @@ private fun StickerDetailSheetContent(
                         putExtra(Intent.EXTRA_STREAM, uri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, if (isVi) "Chia sẻ sticker" else "Share sticker"))
+                    context.startActivity(Intent.createChooser(shareIntent, if (isVi) "Chia sẻ nhãn dán" else "Share sticker"))
                     onClose()
                 },
                 modifier = Modifier.weight(1f),
@@ -919,9 +961,9 @@ private fun StickerDetailSheetContent(
             shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {
-            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+            Icon(Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
             Spacer(modifier = Modifier.width(6.dp))
-            Text(if (isVi) "Xóa Sticker này" else "Delete this sticker", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
+            Text(if (isVi) "Xóa nhãn dán này" else "Delete sticker", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

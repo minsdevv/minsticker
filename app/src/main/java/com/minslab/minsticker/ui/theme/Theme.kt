@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.minslab.minsticker.data.ThemeMode
 
 val GoogleLightColorScheme = lightColorScheme(
@@ -37,7 +38,8 @@ val GoogleLightColorScheme = lightColorScheme(
     error = GoogleLightError,
     onError = GoogleLightOnError,
     errorContainer = GoogleLightErrorContainer,
-    onErrorContainer = GoogleLightOnErrorContainer
+    onErrorContainer = GoogleLightOnErrorContainer,
+    surfaceTint = Color.Transparent
 )
 
 val GoogleDarkColorScheme = darkColorScheme(
@@ -69,7 +71,8 @@ val GoogleDarkColorScheme = darkColorScheme(
     error = GoogleDarkError,
     onError = GoogleDarkOnError,
     errorContainer = GoogleDarkErrorContainer,
-    onErrorContainer = GoogleDarkOnErrorContainer
+    onErrorContainer = GoogleDarkOnErrorContainer,
+    surfaceTint = Color.Transparent
 )
 
 // Backward compatibility aliases for static references

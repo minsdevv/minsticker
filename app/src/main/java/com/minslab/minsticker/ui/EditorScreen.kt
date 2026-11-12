@@ -22,12 +22,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FilterDrama
+import androidx.compose.material.icons.filled.Grain
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,7 +67,7 @@ import androidx.compose.ui.unit.sp
 import com.minslab.minsticker.data.StickerRepository
 import com.minslab.minsticker.segmentation.EdgeRefiner
 import com.minslab.minsticker.segmentation.OutlineRenderer
-import com.minslab.minsticker.segmentation.OutlineStyle
+import com.minslab.minsticker.segmentation.StickerEffect
 import com.minslab.minsticker.segmentation.StickerOptimizer
 import com.minslab.minsticker.segmentation.SubjectSegmenter
 import kotlinx.coroutines.launch
@@ -84,7 +91,7 @@ fun EditorScreen(
     var isProcessing by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    var currentOutlineStyle by remember { mutableStateOf(OutlineStyle.REGULAR) }
+    var currentEffect by remember { mutableStateOf(StickerEffect.OUTLINE) }
     var enableShadow by remember { mutableStateOf(true) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -117,27 +124,27 @@ fun EditorScreen(
             result.onSuccess { fg ->
                 val refined = EdgeRefiner.refineEdges(fg)
                 segmentedBitmap = refined
-                previewBitmap = OutlineRenderer.renderOutline(refined, currentOutlineStyle, enableShadow)
+                previewBitmap = OutlineRenderer.renderEffect(refined, currentEffect, enableShadow)
             }.onFailure { err ->
                 errorMessage = err.message ?: "Không thể tách chủ thể"
             }
         } catch (e: Exception) {
-            errorMessage = "Lỗi đọc ảnh: ${e.message}"
+            errorMessage = "Lỗi đọc tệp hình ảnh: ${e.message}"
         } finally {
             isProcessing = false
         }
     }
 
-    // Update styled preview when outline or shadow toggles
-    LaunchedEffect(currentOutlineStyle, enableShadow, segmentedBitmap) {
+    // Update styled preview when effect or shadow toggles
+    LaunchedEffect(currentEffect, enableShadow, segmentedBitmap) {
         val seg = segmentedBitmap ?: return@LaunchedEffect
-        previewBitmap = OutlineRenderer.renderOutline(seg, currentOutlineStyle, enableShadow)
+        previewBitmap = OutlineRenderer.renderEffect(seg, currentEffect, enableShadow)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tạo Sticker", fontWeight = FontWeight.Bold) },
+                title = { Text("Biên tập nhãn dán", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
@@ -172,12 +179,12 @@ fun EditorScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Đang tách nền AI...", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+                        Text("Đang tự động tách nền...", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
                     }
                 } else if (previewBitmap != null) {
                     Image(
                         bitmap = previewBitmap!!.asImageBitmap(),
-                        contentDescription = "Sticker Preview",
+                        contentDescription = "Xem trước nhãn dán",
                         modifier = Modifier
                             .fillMaxSize(0.85f)
                             .padding(16.dp)
@@ -199,14 +206,14 @@ fun EditorScreen(
                         ) {
                             Icon(
                                 Icons.Default.AddPhotoAlternate,
-                                contentDescription = "Chọn ảnh",
+                                contentDescription = "Chọn hình ảnh",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            "Chạm để chọn ảnh từ bộ sưu tập",
+                            "Chọn hình ảnh từ thư viện để tạo nhãn dán",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
@@ -252,7 +259,7 @@ fun EditorScreen(
             if (segmentedBitmap != null && !isProcessing) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        "Kiểu viền sticker (phong cách iOS 17):",
+                        "Hiệu ứng nhãn dán (Phong cách iOS 17):",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
@@ -260,20 +267,38 @@ fun EditorScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
+                    LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        OutlineStyle.values().forEach { style ->
+                        items(StickerEffect.entries) { effect ->
+                            val isSelected = currentEffect == effect
+                            val icon = when (effect) {
+                                StickerEffect.ORIGINAL -> Icons.Default.Image
+                                StickerEffect.OUTLINE -> Icons.Default.Palette
+                                StickerEffect.COMIC -> Icons.Default.FilterDrama
+                                StickerEffect.PUFFY -> Icons.Default.Grain
+                                StickerEffect.SHINY -> Icons.Default.AutoAwesome
+                            }
+
                             FilterChip(
-                                selected = currentOutlineStyle == style,
-                                onClick = { currentOutlineStyle = style },
-                                label = { Text(style.title, fontSize = 12.sp) },
+                                selected = isSelected,
+                                onClick = { currentEffect = effect },
+                                leadingIcon = {
+                                    Icon(
+                                        icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                },
+                                label = { Text(effect.title, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
                                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
                                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    labelColor = MaterialTheme.colorScheme.onSurface
+                                    labelColor = MaterialTheme.colorScheme.onSurface,
+                                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
                         }
@@ -286,7 +311,7 @@ fun EditorScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Đổ bóng nổi (Drop Shadow)", color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
+                        Text("Bóng đổ tự nhiên (Drop Shadow)", color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                         Switch(
                             checked = enableShadow,
                             onCheckedChange = { enableShadow = it },
@@ -318,7 +343,7 @@ fun EditorScreen(
                                 contentColor = MaterialTheme.colorScheme.onSurface
                             )
                         ) {
-                            Text("Đổi ảnh", color = MaterialTheme.colorScheme.onSurface)
+                            Text("Chọn ảnh khác", color = MaterialTheme.colorScheme.onSurface)
                         }
 
                         Button(
@@ -354,7 +379,7 @@ fun EditorScreen(
                         ) {
                             Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Lưu Sticker", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                            Text("Lưu nhãn dán", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

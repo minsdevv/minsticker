@@ -24,13 +24,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -101,7 +102,7 @@ fun SettingsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Quay lại",
+                            contentDescription = if (isVi) "Quay lại" else "Back",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -123,7 +124,7 @@ fun SettingsScreen(
             // --- Section: App Theme ---
             item {
                 SettingsSection(
-                    title = if (isVi) "Giao diện Ứng dụng" else "App Theme",
+                    title = if (isVi) "Giao diện ứng dụng" else "App Theme",
                     icon = Icons.Default.Palette
                 ) {
                     ThemeSelectorRow(
@@ -137,7 +138,7 @@ fun SettingsScreen(
             // --- Section: Keyboard Theme ---
             item {
                 SettingsSection(
-                    title = if (isVi) "Giao diện Bàn phím" else "Keyboard Theme",
+                    title = if (isVi) "Giao diện bàn phím" else "Keyboard Theme",
                     icon = Icons.Default.Keyboard
                 ) {
                     ThemeSelectorRow(
@@ -151,8 +152,8 @@ fun SettingsScreen(
             // --- Section: Language ---
             item {
                 SettingsSection(
-                    title = if (isVi) "Ngôn ngữ" else "Language",
-                    icon = Icons.Default.Language
+                    title = if (isVi) "Ngôn ngữ hiển thị" else "Language",
+                    icon = Icons.Default.Translate
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -177,7 +178,7 @@ fun SettingsScreen(
             // --- Section: Storage & Sticker Management ---
             item {
                 SettingsSection(
-                    title = if (isVi) "Bộ nhớ & Sticker" else "Storage & Stickers",
+                    title = if (isVi) "Quản lý dữ liệu & Bộ nhớ" else "Storage & Data",
                     icon = Icons.Default.Storage
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -187,7 +188,7 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (isVi) "Tổng số sticker lưu trữ:" else "Total saved stickers:",
+                                text = if (isVi) "Tổng số nhãn dán trong thư viện:" else "Total saved stickers:",
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -207,14 +208,14 @@ fun SettingsScreen(
                             shape = RoundedCornerShape(14.dp)
                         ) {
                             Icon(
-                                Icons.Default.DeleteForever,
+                                Icons.Default.DeleteSweep,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (isVi) "Xóa tất cả sticker" else "Delete all stickers",
+                                text = if (isVi) "Xóa toàn bộ thư viện nhãn dán" else "Delete all saved stickers",
                                 color = MaterialTheme.colorScheme.error,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 13.sp
@@ -234,21 +235,17 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
+                        // App icon: full bleed directly occupying the entire rounded box
+                        Image(
+                            painter = painterResource(id = R.drawable.app_icon),
+                            contentDescription = "App Icon",
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(64.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                                contentDescription = "App Icon",
-                                modifier = Modifier.size(54.dp)
-                            )
-                        }
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                        )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
                             text = "Minsticker",
@@ -257,7 +254,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Phiên bản 0.1.3 (Google Material You)",
+                            text = "Phiên bản 0.1.4 (Google Material 3)",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -266,11 +263,11 @@ fun SettingsScreen(
 
                         Text(
                             text = if (isVi)
-                                "Bàn phím Sticker iOS 17 cho Android với giao diện Google Material 3 chuẩn. 100% Offline & Bảo mật (Không có quyền Internet)."
+                                "Bàn phím nhãn dán phong cách iOS 17 dành cho Android với thiết kế Google Material 3 chuẩn xác. Hoạt động 100% ngoại tuyến và tôn trọng quyền riêng tư (không yêu cầu quyền Internet)."
                             else
-                                "iOS 17 Sticker Keyboard for Android with standard Google Material 3. 100% Offline & Private (No Internet permission).",
+                                "iOS 17 Sticker Keyboard for Android crafted with standard Google Material 3. Fully offline and privacy-respecting (zero Internet permissions).",
                             fontSize = 12.sp,
-                            lineHeight = 16.sp,
+                            lineHeight = 17.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
@@ -288,14 +285,14 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
             title = {
-                Text(text = if (isVi) "Xác nhận xóa tất cả?" else "Confirm delete all?")
+                Text(text = if (isVi) "Xác nhận xóa toàn bộ nhãn dán?" else "Confirm deletion?")
             },
             text = {
                 Text(
                     text = if (isVi)
-                        "Hành động này sẽ xóa vĩnh viễn tất cả ${stickers.size} sticker trong thư viện của bạn."
+                        "Thao tác này không thể hoàn tác. Tất cả ${stickers.size} nhãn dán trong thư viện của bạn sẽ bị xóa hoàn toàn khỏi thiết bị."
                     else
-                        "This will permanently delete all ${stickers.size} stickers in your library."
+                        "This action cannot be undone. All ${stickers.size} stickers will be permanently deleted from your device storage."
                 )
             },
             confirmButton = {
@@ -306,14 +303,14 @@ fun SettingsScreen(
                             showDeleteConfirmDialog = false
                             Toast.makeText(
                                 context,
-                                if (isVi) "Đã xóa toàn bộ sticker" else "Deleted all stickers",
+                                if (isVi) "Đã xóa toàn bộ nhãn dán" else "All stickers deleted",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
                 ) {
                     Text(
-                        text = if (isVi) "Xóa" else "Delete",
+                        text = if (isVi) "Xóa toàn bộ" else "Delete All",
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Bold
                     )
@@ -489,9 +486,11 @@ private fun LanguageCard(
         contentAlignment = Alignment.Center
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = if (language == AppLanguage.VI) "🇻🇳" else "🇺🇸",
-                fontSize = 18.sp
+            Icon(
+                Icons.Default.Translate,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(

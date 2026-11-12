@@ -35,6 +35,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -356,17 +359,23 @@ class MinsImeService : InputMethodService(),
                         when (selectedTabIndex) {
                             1 -> {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("❤️", fontSize = 28.sp)
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Icon(
+                                        Icons.Default.FavoriteBorder,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        if (isVi) "Chưa có sticker yêu thích" else "No favorite stickers",
+                                        if (isVi) "Chưa có nhãn dán yêu thích" else "No favorite stickers",
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        if (isVi) "Mở ứng dụng Minsticker để gắn tim sticker bạn thích"
-                                        else "Open Minsticker app to heart stickers you love",
+                                        if (isVi) "Mở ứng dụng Minsticker và nhấn yêu thích nhãn dán để hiển thị tại đây"
+                                        else "Open Minsticker app and favorite stickers to see them here",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
                                     )
@@ -374,17 +383,23 @@ class MinsImeService : InputMethodService(),
                             }
                             2 -> {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("🕒", fontSize = 28.sp)
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Icon(
+                                        Icons.Default.History,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        if (isVi) "Chưa có sticker gần đây" else "No recent stickers",
+                                        if (isVi) "Chưa có nhãn dán gần đây" else "No recent stickers",
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        if (isVi) "Chạm vào sticker ở tab Tất cả để gửi ngay"
-                                        else "Tap any sticker in All tab to send",
+                                        if (isVi) "Gửi nhãn dán từ thẻ Tất cả để lưu vào danh sách gần đây"
+                                        else "Send stickers from All tab to show here",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
                                     )
@@ -395,18 +410,23 @@ class MinsImeService : InputMethodService(),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier.padding(16.dp)
                                 ) {
-                                    Text("✨", fontSize = 32.sp)
+                                    Icon(
+                                        Icons.Default.AutoAwesome,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(32.dp)
+                                    )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        if (isVi) "Chưa có sticker nào" else "No stickers yet",
+                                        if (isVi) "Thư viện nhãn dán trống" else "No stickers yet",
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        if (isVi) "Tạo sticker từ ảnh trong thư viện để sử dụng!"
-                                        else "Create stickers from gallery photos to start using!",
+                                        if (isVi) "Tạo nhãn dán từ ảnh để bắt đầu sử dụng"
+                                        else "Create stickers from photos to start using",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
                                     )
@@ -430,7 +450,7 @@ class MinsImeService : InputMethodService(),
                                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            if (isVi) "Tạo Sticker Từ Ảnh" else "Create Sticker From Photo",
+                                            if (isVi) "Tạo nhãn dán mới" else "Create New Sticker",
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.SemiBold
                                         )
