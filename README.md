@@ -1,5 +1,8 @@
 # Minsticker 🎨
 
+[![Build & Release](https://github.com/minsdevv/minsticker/actions/workflows/release.yml/badge.svg)](https://github.com/minsdevv/minsticker/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > **Bàn phím Sticker phong cách iOS 17 dành cho Android**
 > Cắt chủ thể ảnh thông minh (cutout) on-device, tạo viền trắng nổi và gửi sticker trong suốt thẳng vào **Zalo**, **WhatsApp**, **Telegram**, **Messenger**.
 
@@ -37,7 +40,11 @@
 
 ## 🚀 Cài đặt & Build
 
-### Yêu cầu môi trường
+### Tải nhanh file APK cài đặt
+* Tải bản APK Release mới nhất tại mục [Releases](https://github.com/minsdevv/minsticker/releases).
+* Hoặc tải file `.apk` từ Artifacts của [GitHub Actions](https://github.com/minsdevv/minsticker/actions).
+
+### Tự Build từ mã nguồn
 * Android Studio Ladybug / Koala hoặc JDK 17+
 * Android SDK 35 (minSdk 29, targetSdk 35)
 
