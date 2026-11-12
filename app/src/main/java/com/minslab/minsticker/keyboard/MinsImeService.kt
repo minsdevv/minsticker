@@ -204,6 +204,7 @@ class MinsImeService : InputMethodService(),
                 currentPackageName.contains("instagram") -> "Instagram" to Color(0xFFE1306C)
                 currentPackageName.contains("viber") -> "Viber" to Color(0xFF7360F2)
                 currentPackageName.contains("messages") -> "Messages" to Color(0xFF89B4FA)
+                currentPackageName.contains("minsticker") -> "Phòng Test" to Color(0xFFA6E3A1)
                 else -> "Sticker" to Color(0xFFA6ADC8)
             }
         }
