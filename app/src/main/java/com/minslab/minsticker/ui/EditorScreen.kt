@@ -52,35 +52,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.minslab.minsticker.data.StickerRepository
-import com.minslab.minsticker.keyboard.SampleStickerGenerator
 import com.minslab.minsticker.segmentation.EdgeRefiner
 import com.minslab.minsticker.segmentation.OutlineRenderer
 import com.minslab.minsticker.segmentation.OutlineStyle
 import com.minslab.minsticker.segmentation.StickerOptimizer
 import com.minslab.minsticker.segmentation.SubjectSegmenter
-import com.minslab.minsticker.ui.theme.M3Background
-import com.minslab.minsticker.ui.theme.M3Error
-import com.minslab.minsticker.ui.theme.M3ErrorContainer
-import com.minslab.minsticker.ui.theme.M3OnBackground
-import com.minslab.minsticker.ui.theme.M3OnErrorContainer
-import com.minslab.minsticker.ui.theme.M3OnPrimary
-import com.minslab.minsticker.ui.theme.M3OnPrimaryContainer
-import com.minslab.minsticker.ui.theme.M3OnSurface
-import com.minslab.minsticker.ui.theme.M3OnSurfaceVariant
-import com.minslab.minsticker.ui.theme.M3Outline
-import com.minslab.minsticker.ui.theme.M3OutlineVariant
-import com.minslab.minsticker.ui.theme.M3Primary
-import com.minslab.minsticker.ui.theme.M3PrimaryContainer
-import com.minslab.minsticker.ui.theme.M3SurfaceContainer
-import com.minslab.minsticker.ui.theme.M3SurfaceContainerHigh
-import com.minslab.minsticker.ui.theme.M3SurfaceContainerHighest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -162,13 +144,13 @@ fun EditorScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = M3Background,
-                    titleContentColor = M3OnBackground,
-                    navigationIconContentColor = M3OnBackground
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
-        containerColor = M3Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -182,15 +164,15 @@ fun EditorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(M3SurfaceContainer, RoundedCornerShape(24.dp))
-                    .border(1.dp, M3OutlineVariant.copy(alpha = 0.5f), RoundedCornerShape(24.dp)),
+                    .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(24.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(24.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (isProcessing) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = M3Primary)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Đang tách nền AI...", color = M3OnSurface, fontSize = 14.sp)
+                        Text("Đang tách nền AI...", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
                     }
                 } else if (previewBitmap != null) {
                     Image(
@@ -213,19 +195,19 @@ fun EditorScreen(
                             },
                             modifier = Modifier
                                 .size(64.dp)
-                                .background(M3Primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.primary, CircleShape)
                         ) {
                             Icon(
                                 Icons.Default.AddPhotoAlternate,
                                 contentDescription = "Chọn ảnh",
-                                tint = M3OnPrimary,
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             "Chạm để chọn ảnh từ bộ sưu tập",
-                            color = M3OnSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
                     }
@@ -240,7 +222,7 @@ fun EditorScreen(
                     ) {
                         Text(
                             text = errorMessage!!,
-                            color = M3Error,
+                            color = MaterialTheme.colorScheme.error,
                             fontSize = 12.sp,
                             lineHeight = 16.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -248,17 +230,17 @@ fun EditorScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
-                                val sample = SampleStickerGenerator.createSampleBitmap()
-                                segmentedBitmap = sample
-                                errorMessage = null
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = M3PrimaryContainer,
-                                contentColor = M3OnPrimaryContainer
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Dùng hình mẫu thử nghiệm (Waydroid)", fontSize = 12.sp)
+                            Text("Chọn ảnh khác từ Thư viện", fontSize = 12.sp)
                         }
                     }
                 }
@@ -271,7 +253,7 @@ fun EditorScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Kiểu viền sticker (phong cách iOS 17):",
-                        color = M3OnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -288,10 +270,10 @@ fun EditorScreen(
                                 onClick = { currentOutlineStyle = style },
                                 label = { Text(style.title, fontSize = 12.sp) },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = M3Primary,
-                                    selectedLabelColor = M3OnPrimary,
-                                    containerColor = M3SurfaceContainerHigh,
-                                    labelColor = M3OnSurface
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    labelColor = MaterialTheme.colorScheme.onSurface
                                 )
                             )
                         }
@@ -304,15 +286,15 @@ fun EditorScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Đổ bóng nổi (Drop Shadow)", color = M3OnSurface, fontSize = 13.sp)
+                        Text("Đổ bóng nổi (Drop Shadow)", color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                         Switch(
                             checked = enableShadow,
                             onCheckedChange = { enableShadow = it },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = M3OnPrimary,
-                                checkedTrackColor = M3Primary,
-                                uncheckedTrackColor = M3SurfaceContainerHighest,
-                                uncheckedThumbColor = M3Outline
+                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.outline
                             )
                         )
                     }
@@ -332,11 +314,11 @@ fun EditorScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = M3SurfaceContainerHigh,
-                                contentColor = M3OnSurface
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             )
                         ) {
-                            Text("Đổi ảnh", color = M3OnSurface)
+                            Text("Đổi ảnh", color = MaterialTheme.colorScheme.onSurface)
                         }
 
                         Button(
@@ -366,13 +348,13 @@ fun EditorScreen(
                             modifier = Modifier.weight(1.5f),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = M3Primary,
-                                contentColor = M3OnPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             )
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = M3OnPrimary)
+                            Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Lưu Sticker", color = M3OnPrimary, fontWeight = FontWeight.Bold)
+                            Text("Lưu Sticker", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

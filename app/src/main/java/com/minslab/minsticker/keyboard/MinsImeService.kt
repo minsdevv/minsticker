@@ -8,13 +8,9 @@ import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -35,19 +31,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -63,7 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
@@ -83,19 +73,9 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import coil.compose.rememberAsyncImagePainter
 import com.minslab.minsticker.MainActivity
-import com.minslab.minsticker.data.StickerEntity
+import com.minslab.minsticker.data.AppLanguage
+import com.minslab.minsticker.data.PreferencesManager
 import com.minslab.minsticker.data.StickerRepository
-import com.minslab.minsticker.ui.theme.M3Background
-import com.minslab.minsticker.ui.theme.M3OnPrimary
-import com.minslab.minsticker.ui.theme.M3OnPrimaryContainer
-import com.minslab.minsticker.ui.theme.M3OnSurface
-import com.minslab.minsticker.ui.theme.M3OnSurfaceVariant
-import com.minslab.minsticker.ui.theme.M3OutlineVariant
-import com.minslab.minsticker.ui.theme.M3Primary
-import com.minslab.minsticker.ui.theme.M3PrimaryContainer
-import com.minslab.minsticker.ui.theme.M3SurfaceContainer
-import com.minslab.minsticker.ui.theme.M3SurfaceContainerHigh
-import com.minslab.minsticker.ui.theme.M3SurfaceContainerHighest
 import com.minslab.minsticker.ui.theme.MinstickerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -119,25 +99,13 @@ class MinsImeService : InputMethodService(),
     override val viewModelStore: ViewModelStore get() = store
     override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
 
-    private var currentPackageName by mutableStateOf("Chưa xác định")
-    private var samplePngFile: File? = null
-    private var sampleWebpFile: File? = null
-
     private val repository by lazy { StickerRepository(this) }
+    private val preferences by lazy { PreferencesManager.getInstance(this) }
 
     override fun onCreate() {
         super.onCreate()
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-
-        // Ensure sample stickers exist
-        try {
-            val (png, webp) = SampleStickerGenerator.ensureSampleStickers(this)
-            samplePngFile = png
-            sampleWebpFile = webp
-        } catch (e: Exception) {
-            Log.e(TAG, "Error generating sample sticker", e)
-        }
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
@@ -145,9 +113,9 @@ class MinsImeService : InputMethodService(),
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
-        currentPackageName = info?.packageName ?: "Không rõ"
+        val pkg = info?.packageName ?: "Unknown"
         val mimes = StickerSender.getSupportedMimeTypes(info)
-        Log.i(TAG, "=== Focus Input: Package=$currentPackageName, Mimes=$mimes ===")
+        Log.i(TAG, "Focus Input: Package=$pkg, Mimes=$mimes")
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
@@ -177,12 +145,14 @@ class MinsImeService : InputMethodService(),
             setViewTreeSavedStateRegistryOwner(this@MinsImeService)
 
             setContent {
-                MinstickerTheme {
+                val keyboardTheme by preferences.keyboardTheme.collectAsState()
+
+                MinstickerTheme(themeMode = keyboardTheme) {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(295.dp),
-                        color = M3Background
+                        color = MaterialTheme.colorScheme.surface
                     ) {
                         StickerKeyboardContent()
                     }
@@ -200,6 +170,8 @@ class MinsImeService : InputMethodService(),
         val allStickers by repository.allStickersFlow.collectAsState(initial = emptyList())
         val favStickers by repository.favoriteStickersFlow.collectAsState(initial = emptyList())
         val recentStickers by repository.recentStickersFlow.collectAsState(initial = emptyList())
+        val language by preferences.language.collectAsState()
+        val isVi = language == AppLanguage.VI
 
         val currentStickers = when (selectedTabIndex) {
             1 -> favStickers
@@ -207,34 +179,20 @@ class MinsImeService : InputMethodService(),
             else -> allStickers
         }
 
-        val appBadgeInfo = remember(currentPackageName) {
-            when {
-                currentPackageName.contains("zalo") -> "Zalo" to Color(0xFF0068FF)
-                currentPackageName.contains("whatsapp") -> "WhatsApp" to Color(0xFF25D366)
-                currentPackageName.contains("telegram") -> "Telegram" to Color(0xFF2AABEE)
-                currentPackageName.contains("messenger") -> "Messenger" to Color(0xFF0099FF)
-                currentPackageName.contains("instagram") -> "Instagram" to Color(0xFFE1306C)
-                currentPackageName.contains("viber") -> "Viber" to Color(0xFF7360F2)
-                currentPackageName.contains("messages") -> "Messages" to M3Primary
-                currentPackageName.contains("minsticker") -> "Phòng Test" to M3Primary
-                else -> "Sticker" to M3OnSurfaceVariant
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(M3Background)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             // Subtle top divider
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(M3OutlineVariant.copy(alpha = 0.35f))
+                    .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             )
 
-            // Top Control Bar (Material 3 Expressive Pill Drawer)
+            // Top Control Bar (Expressive Pill Drawer)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -246,7 +204,7 @@ class MinsImeService : InputMethodService(),
                     modifier = Modifier
                         .size(36.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(M3SurfaceContainerHigh)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                         .clickable {
                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                             switchToNextInputMethod(false)
@@ -255,58 +213,38 @@ class MinsImeService : InputMethodService(),
                 ) {
                     Icon(
                         Icons.Default.Keyboard,
-                        contentDescription = "Đổi phím",
-                        tint = M3OnSurface,
+                        contentDescription = if (isVi) "Đổi phím" else "Switch Keyboard",
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // Target App Badge
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(M3SurfaceContainer)
-                        .padding(horizontal = 8.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(7.dp)
-                            .clip(CircleShape)
-                            .background(appBadgeInfo.second)
-                    )
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Text(
-                        text = appBadgeInfo.first,
-                        color = M3OnSurface,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
                 // Google Pixel Material You Segmented Category Tabs
                 Row(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(M3SurfaceContainer)
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
                         .padding(2.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val tabs = listOf("Tất cả", "Yêu thích", "Gần đây")
-                    tabs.forEachIndexed { index, title ->
+                    val tabTitles = if (isVi) {
+                        listOf("Tất cả", "Yêu thích", "Gần đây")
+                    } else {
+                        listOf("All", "Favorites", "Recent")
+                    }
+
+                    tabTitles.forEachIndexed { index, title ->
                         val isSelected = selectedTabIndex == index
                         val bg by animateColorAsState(
-                            targetValue = if (isSelected) M3Primary else Color.Transparent,
+                            targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                             label = "tabBg"
                         )
                         val textColor by animateColorAsState(
-                            targetValue = if (isSelected) M3OnPrimary else M3OnSurfaceVariant,
+                            targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                             label = "tabText"
                         )
                         Box(
@@ -332,14 +270,14 @@ class MinsImeService : InputMethodService(),
                     }
                 }
 
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
                 // Fast Add Sticker Button ("+")
                 Box(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(M3SurfaceContainerHigh)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                         .clickable {
                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                             val intent = Intent(this@MinsImeService, MainActivity::class.java).apply {
@@ -352,8 +290,8 @@ class MinsImeService : InputMethodService(),
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Tạo sticker mới",
-                        tint = M3Primary,
+                        contentDescription = if (isVi) "Tạo sticker mới" else "Create sticker",
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -366,7 +304,10 @@ class MinsImeService : InputMethodService(),
                     modifier = Modifier
                         .size(36.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (isBackspaceHeld) M3SurfaceContainerHighest else M3SurfaceContainerHigh)
+                        .background(
+                            if (isBackspaceHeld) MaterialTheme.colorScheme.surfaceContainerHighest
+                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onPress = {
@@ -392,8 +333,8 @@ class MinsImeService : InputMethodService(),
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Backspace,
-                        contentDescription = "Xóa",
-                        tint = M3OnSurface,
+                        contentDescription = if (isVi) "Xóa" else "Backspace",
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -407,7 +348,7 @@ class MinsImeService : InputMethodService(),
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
                 if (currentStickers.isEmpty()) {
-                    // Contextual Empty States
+                    // Clean Empty States (No sample smiley stickers)
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -418,14 +359,15 @@ class MinsImeService : InputMethodService(),
                                     Text("❤️", fontSize = 28.sp)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        "Chưa có sticker yêu thích",
-                                        color = M3OnSurface,
+                                        if (isVi) "Chưa có sticker yêu thích" else "No favorite stickers",
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
                                     Text(
-                                        "Mở ứng dụng Minsticker để gắn tim sticker bạn thích",
-                                        color = M3OnSurfaceVariant,
+                                        if (isVi) "Mở ứng dụng Minsticker để gắn tim sticker bạn thích"
+                                        else "Open Minsticker app to heart stickers you love",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
                                     )
                                 }
@@ -435,49 +377,40 @@ class MinsImeService : InputMethodService(),
                                     Text("🕒", fontSize = 28.sp)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        "Chưa có sticker gần đây",
-                                        color = M3OnSurface,
+                                        if (isVi) "Chưa có sticker gần đây" else "No recent stickers",
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Medium
                                     )
                                     Text(
-                                        "Chạm vào sticker ở tab Tất cả để gửi ngay",
-                                        color = M3OnSurfaceVariant,
+                                        if (isVi) "Chạm vào sticker ở tab Tất cả để gửi ngay"
+                                        else "Tap any sticker in All tab to send",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
                                     )
                                 }
                             }
                             else -> {
-                                // All stickers empty: Show sample sticker + invite to create
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.padding(12.dp)
+                                    modifier = Modifier.padding(16.dp)
                                 ) {
-                                    samplePngFile?.let { file ->
-                                        if (file.exists()) {
-                                            StickerItemView(
-                                                file = file,
-                                                onClick = {
-                                                    view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                                    StickerSender.sendSticker(
-                                                        this@MinsImeService,
-                                                        currentInputConnection,
-                                                        currentInputEditorInfo,
-                                                        file
-                                                    )
-                                                },
-                                                modifier = Modifier.size(76.dp)
-                                            )
-                                            Spacer(modifier = Modifier.height(6.dp))
-                                            Text(
-                                                "Chạm sticker mẫu ở trên để gửi thử!",
-                                                color = M3Primary,
-                                                fontSize = 11.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(10.dp))
-                                        }
-                                    }
-
+                                    Text("✨", fontSize = 32.sp)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        if (isVi) "Chưa có sticker nào" else "No stickers yet",
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        if (isVi) "Tạo sticker từ ảnh trong thư viện để sử dụng!"
+                                        else "Create stickers from gallery photos to start using!",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 11.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
                                     Button(
                                         onClick = {
                                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
@@ -488,15 +421,19 @@ class MinsImeService : InputMethodService(),
                                             startActivity(intent)
                                         },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = M3Primary,
-                                            contentColor = M3OnPrimary
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
                                         ),
                                         shape = RoundedCornerShape(12.dp),
-                                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
                                     ) {
                                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Tạo Sticker Từ Ảnh", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                        Text(
+                                            if (isVi) "Tạo Sticker Từ Ảnh" else "Create Sticker From Photo",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
                                     }
                                 }
                             }
@@ -549,36 +486,31 @@ class MinsImeService : InputMethodService(),
     ) {
         val interactionSource = remember { MutableInteractionSource() }
         val isPressed by interactionSource.collectIsPressedAsState()
-
-        val scale by animateFloatAsState(
+        val scale by androidx.compose.animation.core.animateFloatAsState(
             targetValue = if (isPressed) 0.88f else 1.0f,
-            animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+            animationSpec = androidx.compose.animation.core.spring(
+                dampingRatio = 0.6f,
+                stiffness = 500f
+            ),
             label = "stickerScale"
-        )
-
-        val bgAlpha by animateFloatAsState(
-            targetValue = if (isPressed) 0.22f else 0.06f,
-            label = "stickerBgAlpha"
         )
 
         Box(
             modifier = modifier
                 .scale(scale)
                 .clip(RoundedCornerShape(16.dp))
-                .background(M3Primary.copy(alpha = bgAlpha))
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,
                     onClick = onClick
-                ),
+                )
+                .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = rememberAsyncImagePainter(file),
                 contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize(0.88f)
-                    .padding(2.dp)
+                modifier = Modifier.fillMaxSize()
             )
         }
     }

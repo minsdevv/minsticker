@@ -139,6 +139,7 @@ Hoàn thành khi: bảng kết quả được điền và có quyết định ch
 - [x] Phase 4 – Thư viện sticker (Hoàn thành: Room Database StickerDao/PackDao, StickerRepository quản lý file private, UI Compose HomeScreen quản lý sticker/yêu thích/xóa, EditorScreen tạo sticker từ ảnh)
 - [x] Phase 5 – Bàn phím IME (Hoàn thành: MinsImeService tích hợp ComposeView phong cách iOS 17 Floating Stickers, hiệu ứng bounce spring & haptic feedback, tab Tất cả/Yêu thích/Gần đây, xóa nhanh liên tục, tạo sticker ngay từ bàn phím, StickerSender gửi commitContent và ACTION_SEND Zalo type=3)
 - [x] Phase 6 – Onboarding, Theme Dotfiles & Hoàn thiện (Hoàn thành: Google Material You đồng bộ màu từ Matugen/Quickshell dotfiles (#191114 obsidian plum, #FFB0CC pastel rose), phòng thử nghiệm bàn phím trực tiếp (Keyboard Preview Sandbox) qua ViewCompat.setOnReceiveContentListener, Dynamic 2-step Onboarding, Adaptive Icon vector iOS 17, đa ngôn ngữ VI/EN, tối ưu nén R8 và kiểm thử trực tiếp trên Waydroid)
+- [x] Phase 6.1 – Google Material 3 Chuẩn, Theme Sáng/Tối & Cài đặt (Hoàn thành: Chuyển đổi toàn diện sang bảng màu Google Pixel Baseline #1A73E8/#8AB4F8, tích hợp PreferencesManager hỗ trợ Sáng/Tối/Hệ thống độc lập cho App và Bàn phím IME, tạo màn hình SettingsScreen chuẩn Google Pixel, đa ngôn ngữ VI/EN, xóa hoàn toàn sticker mẫu và app badge trên bàn phím, cập nhật bộ App Icon từ ảnh gốc người dùng cung cấp)
 - [ ] Phase 7 – Kiểm thử trên thiết bị thật và phát hành
 
 ## 8. Rủi ro đã biết

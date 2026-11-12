@@ -3,42 +3,81 @@ package com.minslab.minsticker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Material You (Material 3) palette extracted directly from user's current
- * QuickShell / Hyprland Matugen preset (~/.local/state/quickshell/user/generated/colors.json).
+ * Standard Google Material 3 (Material You / Google Pixel Baseline) Palette.
+ * Authentic Google Blue & Surface Tokens for clean, native Android experience.
  */
-val M3Background = Color(0xFF191114)
-val M3OnBackground = Color(0xFFEEDFE2)
-val M3Surface = Color(0xFF191114)
-val M3OnSurface = Color(0xFFEEDFE2)
-val M3SurfaceVariant = Color(0xFF514347)
-val M3OnSurfaceVariant = Color(0xFFD5C2C6)
-val M3SurfaceContainerLowest = Color(0xFF130C0F)
-val M3SurfaceContainerLow = Color(0xFF21191C)
-val M3SurfaceContainer = Color(0xFF261D20)
-val M3SurfaceContainerHigh = Color(0xFF31282A)
-val M3SurfaceContainerHighest = Color(0xFF3C3235)
-val M3SurfaceBright = Color(0xFF403739)
-val M3SurfaceDim = Color(0xFF191114)
 
-val M3Primary = Color(0xFFFFB0CC)
-val M3OnPrimary = Color(0xFF541D35)
-val M3PrimaryContainer = Color(0xFF6F334C)
-val M3OnPrimaryContainer = Color(0xFFFFD9E4)
+// --- Light Scheme Tokens (Google Baseline Light) ---
+val GoogleLightPrimary = Color(0xFF1A73E8)
+val GoogleLightOnPrimary = Color(0xFFFFFFFF)
+val GoogleLightPrimaryContainer = Color(0xFFD2E3FC)
+val GoogleLightOnPrimaryContainer = Color(0xFF041E49)
 
-val M3Secondary = Color(0xFFE2BDC8)
-val M3OnSecondary = Color(0xFF422932)
-val M3SecondaryContainer = Color(0xFF5A3F48)
-val M3OnSecondaryContainer = Color(0xFFFFD9E4)
+val GoogleLightSecondary = Color(0xFF00639B)
+val GoogleLightOnSecondary = Color(0xFFFFFFFF)
+val GoogleLightSecondaryContainer = Color(0xFFC2E7FF)
+val GoogleLightOnSecondaryContainer = Color(0xFF001D35)
 
-val M3Tertiary = Color(0xFFF0BC96)
-val M3OnTertiary = Color(0xFF48290D)
-val M3TertiaryContainer = Color(0xFF623F21)
-val M3OnTertiaryContainer = Color(0xFFFFDCC4)
+val GoogleLightTertiary = Color(0xFF188038)
+val GoogleLightOnTertiary = Color(0xFFFFFFFF)
+val GoogleLightTertiaryContainer = Color(0xFFCEEAD6)
+val GoogleLightOnTertiaryContainer = Color(0xFF0D652D)
 
-val M3Outline = Color(0xFF9D8C91)
-val M3OutlineVariant = Color(0xFF514347)
+val GoogleLightBackground = Color(0xFFF8F9FA)
+val GoogleLightOnBackground = Color(0xFF1F1F1F)
+val GoogleLightSurface = Color(0xFFFFFFFF)
+val GoogleLightOnSurface = Color(0xFF1F1F1F)
+val GoogleLightSurfaceVariant = Color(0xFFE1E3E1)
+val GoogleLightOnSurfaceVariant = Color(0xFF444746)
 
-val M3Error = Color(0xFFFFB4AB)
-val M3OnError = Color(0xFF690005)
-val M3ErrorContainer = Color(0xFF93000A)
-val M3OnErrorContainer = Color(0xFFFFDAD6)
+val GoogleLightSurfaceContainerLowest = Color(0xFFFFFFFF)
+val GoogleLightSurfaceContainerLow = Color(0xFFF8F9FA)
+val GoogleLightSurfaceContainer = Color(0xFFF1F3F4)
+val GoogleLightSurfaceContainerHigh = Color(0xFFE9EEF6)
+val GoogleLightSurfaceContainerHighest = Color(0xFFE1E3E1)
+
+val GoogleLightOutline = Color(0xFF747775)
+val GoogleLightOutlineVariant = Color(0xFFC4C7C5)
+
+val GoogleLightError = Color(0xFFBA1A1A)
+val GoogleLightOnError = Color(0xFFFFFFFF)
+val GoogleLightErrorContainer = Color(0xFFFFDAD6)
+val GoogleLightOnErrorContainer = Color(0xFF410002)
+
+
+// --- Dark Scheme Tokens (Google Baseline Dark) ---
+val GoogleDarkPrimary = Color(0xFF8AB4F8)
+val GoogleDarkOnPrimary = Color(0xFF002B75)
+val GoogleDarkPrimaryContainer = Color(0xFF0842A0)
+val GoogleDarkOnPrimaryContainer = Color(0xFFD2E3FC)
+
+val GoogleDarkSecondary = Color(0xFF7FCFFF)
+val GoogleDarkOnSecondary = Color(0xFF003355)
+val GoogleDarkSecondaryContainer = Color(0xFF004A77)
+val GoogleDarkOnSecondaryContainer = Color(0xFFC2E7FF)
+
+val GoogleDarkTertiary = Color(0xFF81C995)
+val GoogleDarkOnTertiary = Color(0xFF0D652D)
+val GoogleDarkTertiaryContainer = Color(0xFF137333)
+val GoogleDarkOnTertiaryContainer = Color(0xFFCEEAD6)
+
+val GoogleDarkBackground = Color(0xFF1F1F1F)
+val GoogleDarkOnBackground = Color(0xFFE3E3E3)
+val GoogleDarkSurface = Color(0xFF1F1F1F)
+val GoogleDarkOnSurface = Color(0xFFE3E3E3)
+val GoogleDarkSurfaceVariant = Color(0xFF444746)
+val GoogleDarkOnSurfaceVariant = Color(0xFFC4C7C5)
+
+val GoogleDarkSurfaceContainerLowest = Color(0xFF0F0F0F)
+val GoogleDarkSurfaceContainerLow = Color(0xFF1A1C1E)
+val GoogleDarkSurfaceContainer = Color(0xFF282A2D)
+val GoogleDarkSurfaceContainerHigh = Color(0xFF333538)
+val GoogleDarkSurfaceContainerHighest = Color(0xFF3D3F43)
+
+val GoogleDarkOutline = Color(0xFF8E918F)
+val GoogleDarkOutlineVariant = Color(0xFF444746)
+
+val GoogleDarkError = Color(0xFFFFB4AB)
+val GoogleDarkOnError = Color(0xFF690005)
+val GoogleDarkErrorContainer = Color(0xFF93000A)
+val GoogleDarkOnErrorContainer = Color(0xFFFFDAD6)
