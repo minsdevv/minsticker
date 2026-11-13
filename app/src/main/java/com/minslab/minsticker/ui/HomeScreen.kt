@@ -604,7 +604,7 @@ private fun KeyboardPreviewSandbox(
                         focusedEditText?.let { et ->
                             et.requestFocus()
                             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            imm.showSoftInput(et, InputMethodManager.SHOW_FORCED)
+                            imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
                         }
                     }
                     .padding(horizontal = 14.dp, vertical = 6.dp),
@@ -634,7 +634,7 @@ private fun KeyboardPreviewSandbox(
                             setOnClickListener {
                                 requestFocus()
                                 val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+                                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
                             }
 
                             val mimeTypes = arrayOf("image/png", "image/webp", "image/jpeg", "image/*")
@@ -665,7 +665,7 @@ private fun KeyboardPreviewSandbox(
                         focusedEditText?.let { et ->
                             et.requestFocus()
                             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            imm.showSoftInput(et, InputMethodManager.SHOW_FORCED)
+                            imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
                         }
                     },
                     modifier = Modifier.size(32.dp)

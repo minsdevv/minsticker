@@ -12,8 +12,8 @@ android {
         applicationId = "com.minslab.minsticker"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.5"
         resourceConfigurations += listOf("en", "vi")
     }
     buildTypes {
@@ -41,6 +41,11 @@ android {
         checkReleaseBuilds = false
         abortOnError = false
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -67,4 +72,10 @@ dependencies {
 
     // Image Loading
     implementation(libs.coil.compose)
+
+    // Unit Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

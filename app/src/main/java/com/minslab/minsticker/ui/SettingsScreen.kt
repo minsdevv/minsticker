@@ -253,8 +253,17 @@ fun SettingsScreen(
                             fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                        val versionName = remember(context) {
+                            runCatching {
+                                context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                            }.getOrNull() ?: "0.1.5"
+                        }
                         Text(
-                            text = "Phiên bản 0.1.4 (Google Material 3)",
+                            text = if (isVi) {
+                                "Phiên bản $versionName (Google Material 3)"
+                            } else {
+                                "Version $versionName (Google Material 3)"
+                            },
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
