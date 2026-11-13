@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,6 +40,10 @@ class MainActivity : ComponentActivity() {
             val appTheme by preferences.appTheme.collectAsState()
 
             MinstickerTheme(themeMode = appTheme) {
+                BackHandler(enabled = currentScreen !is Screen.Home) {
+                    currentScreen = Screen.Home
+                }
+
                 when (val screen = currentScreen) {
                     is Screen.Home -> {
                         HomeScreen(

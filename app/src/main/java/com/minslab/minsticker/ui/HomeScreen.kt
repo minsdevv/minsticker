@@ -390,7 +390,7 @@ fun HomeScreen(
                                     },
                                     onToggleFavorite = {
                                         scope.launch {
-                                            repository.toggleFavorite(sticker.id, !sticker.isFavorite)
+                                            repository.setFavorite(sticker.id, !sticker.isFavorite)
                                         }
                                     }
                                 )
@@ -419,7 +419,7 @@ fun HomeScreen(
                     isVi = isVi,
                     onToggleFavorite = {
                         scope.launch {
-                            repository.toggleFavorite(sticker.id, !sticker.isFavorite)
+                            repository.setFavorite(sticker.id, !sticker.isFavorite)
                             selectedStickerForAction = null
                         }
                     },
@@ -651,6 +651,11 @@ private fun KeyboardPreviewSandbox(
                                 }
                             })
                         }
+                    },
+                    update = { et ->
+                        et.hint = if (isVi) "Chạm vào đây để mở bàn phím..." else "Tap here to open keyboard..."
+                        et.setTextColor(textColor)
+                        et.setHintTextColor(hintColor)
                     },
                     modifier = Modifier.weight(1f)
                 )

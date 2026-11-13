@@ -15,12 +15,12 @@ import kotlinx.coroutines.withContext
 /**
  * Iconic iOS 17-style sticker effect modes.
  */
-enum class StickerEffect(val title: String, val description: String) {
-    ORIGINAL("Nguyên bản", "Giữ nguyên nét tự nhiên"),
-    OUTLINE("Viền trắng", "Viền decal sắc nét chuẩn iOS 17"),
-    COMIC("Hoạt hình", "Màu sắc rực rỡ và nét vẽ comic"),
-    PUFFY("Nổi khối 3D", "Hiệu ứng phồng nhựa nổi 3D"),
-    SHINY("Lấp lánh", "Viền ánh kim cầu vồng quang phổ")
+enum class StickerEffect(val title: String, val titleEn: String, val description: String) {
+    ORIGINAL("Nguyên bản", "Original", "Giữ nguyên nét tự nhiên"),
+    OUTLINE("Viền trắng", "Outline", "Viền decal sắc nét chuẩn iOS 17"),
+    COMIC("Hoạt hình", "Comic", "Màu sắc rực rỡ và nét vẽ comic"),
+    PUFFY("Nổi khối 3D", "Puffy 3D", "Hiệu ứng phồng nhựa nổi 3D"),
+    SHINY("Lấp lánh", "Shiny", "Viền ánh kim cầu vồng quang phổ")
 }
 
 object OutlineRenderer {

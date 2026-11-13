@@ -91,6 +91,11 @@ class StickerRepository(private val context: Context) {
         }
     }
 
+    suspend fun insertSticker(sticker: StickerEntity) = withContext(Dispatchers.IO) {
+        ensureDefaultPack()
+        stickerDao.insertSticker(sticker)
+    }
+
     suspend fun deleteSticker(sticker: StickerEntity) = withContext(Dispatchers.IO) {
         try {
             File(sticker.filePath).delete()
@@ -99,8 +104,8 @@ class StickerRepository(private val context: Context) {
         stickerDao.deleteSticker(sticker)
     }
 
-    suspend fun toggleFavorite(id: String, currentFav: Boolean) = withContext(Dispatchers.IO) {
-        stickerDao.setFavorite(id, !currentFav)
+    suspend fun setFavorite(id: String, isFavorite: Boolean) = withContext(Dispatchers.IO) {
+        stickerDao.setFavorite(id, isFavorite)
     }
 
     suspend fun markUsed(id: String) = withContext(Dispatchers.IO) {

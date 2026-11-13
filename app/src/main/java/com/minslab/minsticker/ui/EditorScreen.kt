@@ -52,6 +52,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +65,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.minslab.minsticker.data.AppLanguage
+import com.minslab.minsticker.data.PreferencesManager
 import com.minslab.minsticker.data.StickerRepository
 import com.minslab.minsticker.segmentation.EdgeRefiner
 import com.minslab.minsticker.segmentation.OutlineRenderer
@@ -81,7 +84,10 @@ fun EditorScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val preferences = remember { PreferencesManager.getInstance(context) }
     val repository = remember { StickerRepository(context) }
+    val language by preferences.language.collectAsState()
+    val isVi = language == AppLanguage.VI
 
     var selectedUri by remember { mutableStateOf<Uri?>(initialUri) }
     var rawBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -126,10 +132,10 @@ fun EditorScreen(
                 segmentedBitmap = refined
                 previewBitmap = OutlineRenderer.renderEffect(refined, currentEffect, enableShadow)
             }.onFailure { err ->
-                errorMessage = err.message ?: "Không thể tách chủ thể"
+                errorMessage = err.message ?: if (isVi) "Không thể tách chủ thể" else "Could not segment subject"
             }
         } catch (e: Exception) {
-            errorMessage = "Lỗi đọc tệp hình ảnh: ${e.message}"
+            errorMessage = (if (isVi) "Lỗi đọc tệp hình ảnh: " else "Failed to read image: ") + "${e.message}"
         } finally {
             isProcessing = false
         }
@@ -144,10 +150,10 @@ fun EditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Biên tập nhãn dán", fontWeight = FontWeight.Bold) },
+                title = { Text(if (isVi) "Biên tập nhãn dán" else "Sticker Editor", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = if (isVi) "Quay lại" else "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -179,12 +185,16 @@ fun EditorScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Đang tự động tách nền...", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+                        Text(
+                            if (isVi) "Đang tự động tách nền..." else "Segmenting subject...",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 14.sp
+                        )
                     }
                 } else if (previewBitmap != null) {
                     Image(
                         bitmap = previewBitmap!!.asImageBitmap(),
-                        contentDescription = "Xem trước nhãn dán",
+                        contentDescription = if (isVi) "Xem trước nhãn dán" else "Sticker preview",
                         modifier = Modifier
                             .fillMaxSize(0.85f)
                             .padding(16.dp)
@@ -206,14 +216,14 @@ fun EditorScreen(
                         ) {
                             Icon(
                                 Icons.Default.AddPhotoAlternate,
-                                contentDescription = "Chọn hình ảnh",
+                                contentDescription = if (isVi) "Chọn hình ảnh" else "Choose photo",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            "Chọn hình ảnh từ thư viện để tạo nhãn dán",
+                            if (isVi) "Chọn hình ảnh từ thư viện để tạo nhãn dán" else "Select an image from gallery to create sticker",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
@@ -247,7 +257,7 @@ fun EditorScreen(
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Chọn ảnh khác từ Thư viện", fontSize = 12.sp)
+                            Text(if (isVi) "Chọn ảnh khác từ Thư viện" else "Choose another photo", fontSize = 12.sp)
                         }
                     }
                 }
@@ -259,7 +269,7 @@ fun EditorScreen(
             if (segmentedBitmap != null && !isProcessing) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        "Hiệu ứng nhãn dán (Phong cách iOS 17):",
+                        if (isVi) "Hiệu ứng nhãn dán (Phong cách iOS 17):" else "Sticker Effects (iOS 17 Style):",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
@@ -291,7 +301,13 @@ fun EditorScreen(
                                         modifier = Modifier.size(16.dp)
                                     )
                                 },
-                                label = { Text(effect.title, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                                label = {
+                                    Text(
+                                        if (isVi) effect.title else effect.titleEn,
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
                                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
@@ -311,7 +327,11 @@ fun EditorScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Bóng đổ tự nhiên (Drop Shadow)", color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
+                        Text(
+                            if (isVi) "Bóng đổ tự nhiên (Drop Shadow)" else "Drop Shadow",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 13.sp
+                        )
                         Switch(
                             checked = enableShadow,
                             onCheckedChange = { enableShadow = it },
@@ -343,7 +363,7 @@ fun EditorScreen(
                                 contentColor = MaterialTheme.colorScheme.onSurface
                             )
                         ) {
-                            Text("Chọn ảnh khác", color = MaterialTheme.colorScheme.onSurface)
+                            Text(if (isVi) "Chọn ảnh khác" else "Change Photo", color = MaterialTheme.colorScheme.onSurface)
                         }
 
                         Button(
@@ -362,9 +382,7 @@ fun EditorScreen(
                                         width = optimized.width,
                                         height = optimized.height
                                     )
-                                    repository.ensureDefaultPack()
-                                    com.minslab.minsticker.data.MinsDatabase.getInstance(context)
-                                        .stickerDao().insertSticker(entity)
+                                    repository.insertSticker(entity)
 
                                     isProcessing = false
                                     onSavedSuccess()
@@ -379,7 +397,11 @@ fun EditorScreen(
                         ) {
                             Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Lưu nhãn dán", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                            Text(
+                                if (isVi) "Lưu nhãn dán" else "Save Sticker",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
